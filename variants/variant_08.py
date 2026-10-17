@@ -5,9 +5,27 @@
 """
 
 # Впишіть номер свого варіанта (22-24).
-VARIANT = 0
+VARIANT = 23
 
 
-def scenario() -> list:
-    """Повертає сценарій двох сеансів: список кроків (сеанс, SQL), де сеанс це "A" або "B"."""
-    raise NotImplementedError  # TODO: реалізуйте за карткою варіанта
+def scenario():
+    return [
+        # 1. Сеанс А відкриває транзакцію та заблоковує завдання 1
+        ("A", "BEGIN"),
+        ("A", "SELECT id FROM order_job WHERE state = 'new' ORDER BY id LIMIT 1 FOR UPDATE"),
+
+        # 2. Сеанс В без BEGIN пробує взяти завдання через NOWAIT (отримує помилку 55P03, не чекає)
+        ("B", "SELECT id FROM order_job WHERE state = 'new' ORDER BY id LIMIT 1 FOR UPDATE NOWAIT"),
+
+        # 3. Сеанс В відкриває транзакцію та бере вільне завдання 2 через SKIP LOCKED
+        ("B", "BEGIN"),
+        ("B", "SELECT id FROM order_job WHERE state = 'new' ORDER BY id LIMIT 1 FOR UPDATE SKIP LOCKED"),
+
+        # 4. Позначення виконаних завдань
+        ("A", "UPDATE order_job SET state = 'done', handler = 'A' WHERE id = 1"),
+        ("B", "UPDATE order_job SET state = 'done', handler = 'B' WHERE id = 2"),
+
+        # 5. Завершення транзакцій
+        ("A", "COMMIT"),
+        ("B", "COMMIT"),
+    ]
