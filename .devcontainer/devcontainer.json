@@ -1,0 +1,29 @@
+{
+  "name": "Транзакції у двох сесіях (Python + PostgreSQL 18)",
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "app",
+  "workspaceFolder": "/workspace",
+  "postCreateCommand": "pip install --user -r requirements.txt",
+  "remoteEnv": {
+    "PGHOST": "db",
+    "PGPORT": "5432",
+    "PGUSER": "postgres",
+    "PGPASSWORD": "postgres",
+    "PGDATABASE": "postgres"
+  },
+  "forwardPorts": [5432],
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-python.python",
+        "ms-python.vscode-pylance",
+        "ckolkman.vscode-postgres"
+      ],
+      "settings": {
+        "python.testing.pytestEnabled": true,
+        "python.testing.pytestArgs": ["tests"],
+        "files.encoding": "utf8"
+      }
+    }
+  }
+}
